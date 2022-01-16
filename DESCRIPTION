@@ -1,0 +1,22 @@
+Package: fatcat
+Type: Package
+Title: Bayesian categorical factor analysis using Rcpp
+Version: 0.1.0
+Authors@R: person("Vitor", "Capdeville", email = "vgcapdeville@hotmail.com",
+                  role = c("aut", "cre"))
+Description: Fit categorical factor analysis model using Metropolis Hastings algorithm.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    MASS,
+    psych,
+    Rcpp,
+    stats,
+    truncnorm,
+    utils
+LinkingTo: 
+    cpp11,
+    Rcpp
+RoxygenNote: 7.1.2
+SystemRequirements: C++11
