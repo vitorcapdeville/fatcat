@@ -1,4 +1,50 @@
-#' Função para gerar amostras da posterior
+#' Função para gerar amostras da posterior, toda em C++.
+#'
+#' @param y dados. deve ter dimensao jxn
+#' @param p numero de fatores a serem usados no ajuste
+#' @param nit numero de interacoes
+#' @param init_beta valor inicial de beta
+#' @param init_sigma2 valor inicial de sigma2
+#' @param sdpropbeta desvio padrao da proposta
+#' @param sdpropbeta2 desvio padrao da proposta
+#' @param sdpropf desvio padrao da proposta
+#' @param sdpropsigma2 desvio padrao da proposta
+#'
+#' @return uma lista com as cadeias a posteriori
+#'
+#' @import RcppTN
+#'
+#' @export
+fitfatcat <- function(y, p, nit, init_beta = 0.5, init_sigma2 = 2, sdpropbeta = 0.05, sdpropbeta2 = 0.075, sdpropf = 0.4, sdpropsigma2 = 0.075) {
+  # Definicoes e valores iniciais
+  j <- nrow(y)
+  n <- ncol(y)
+  beta <- array(0, dim = c(j, p, nit))
+  sigma2 <- array(NA, dim = c(j, nit))
+  f <- array(NA, dim = c(p, n, nit))
+  beta[1, 1, 1] <- init_beta
+  sigma2[, 1] <- rep(init_sigma2, j)
+  f[, , 1] <- matrix(0, nrow = p, ncol = n)
+  alfa <- psych::polychoric(t(y))$tau
+
+  # Algoritmo
+  # Incluir barra de progresso e checkforinterrupt
+  tempo1 <- Sys.time()
+
+  res <- algoritmo_probit(y, nit, beta, sigma2, f, alfa, sdpropbeta, sdpropbeta2, sdpropf, sdpropsigma2, n, p, j)
+
+  tempo2 <- Sys.time()
+
+  cat("\nExecutado em", round(difftime(tempo2, tempo1),2), units(difftime(tempo2, tempo1)), "\n")
+
+  return(res)
+}
+
+
+
+#' Função para gerar amostras da posterior, usando condicionais completas em C++ e
+#' o algoritmo ainda no R. Mantido aqui para criterios de comparaçao de resultado
+#' e performance
 #'
 #' @param y dados. deve ter dimensao jxn
 #' @param p numero de fatores a serem usados no ajuste
@@ -14,7 +60,7 @@
 #'
 #'
 #' @export
-fitfatcat <- function(y, p, nit, init_beta = 0.5, init_sigma2 = 2, sdpropbeta = 0.05, sdpropbeta2 = 0.075, sdpropf = 0.4, sdpropsigma2 = 0.075) {
+fitfatcat_R <- function(y, p, nit, init_beta = 0.5, init_sigma2 = 2, sdpropbeta = 0.05, sdpropbeta2 = 0.075, sdpropf = 0.4, sdpropsigma2 = 0.075) {
   j <- nrow(y)
   n <- ncol(y)
   beta <- array(0, dim = c(j, p, nit))

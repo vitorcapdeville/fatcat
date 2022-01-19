@@ -52,8 +52,10 @@ corrplot::corrplot(cor, type = "upper")
 # with each other.
 
 # Fit the model
-nit <- 1000
+nit <- 5000
 res <- fitfatcat(y, p = 2, nit)
+# Slow partial R version
+# res_R <- fitfatcat_R(y, p = 2, nit)
 
 # See the results
 require(ggplot2)
@@ -68,7 +70,7 @@ plot_beta <- function(indice, beta, beta.real) {
     geom_line(aes(y = beta.real[indice[1], indice[2]]), color = "red")
 }
 
-indices <- matrix(unlist(expand.grid(1:j, 1:p.real)), nrow = j*2, ncol = p.real, byrow = F)
+indices <- matrix(unlist(dplyr::arrange(expand.grid(1:j, 1:p.real), Var1)), nrow = j*2, ncol = p.real, byrow = F)
 
 plots_beta <- apply(indices, 1, plot_beta, beta = res$beta, beta.real = beta.real)
 

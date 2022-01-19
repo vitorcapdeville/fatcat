@@ -11,12 +11,12 @@ LazyData: true
 Imports: 
     MASS,
     psych,
-    Rcpp,
+    Rcpp (>= 1.0.8),
     stats,
     truncnorm,
     utils
-LinkingTo: 
-    cpp11,
-    Rcpp
+LinkingTo: Rcpp, RcppArmadillo, RcppTN, RcppProgress
 RoxygenNote: 7.1.2
-SystemRequirements: C++11
+Depends: 
+    RcppTN
+
