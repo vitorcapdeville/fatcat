@@ -4,12 +4,12 @@
 \alias{data_sim}
 \title{Função para simular dados do modelo categórico}
 \usage{
-data_sim(beta, Sigma, alfa, f, link = c("probit", "logit"))
+data_sim(beta, sigma, alfa, f, link = c("probit", "logit"))
 }
 \arguments{
 \item{beta}{matriz jxp}
 
-\item{Sigma}{matriz de variancias jxj}
+\item{sigma}{vetor com a diagonal da matriz de variancias, tamanho j}
 
 \item{alfa}{matriz j x (k+1)}
 
@@ -27,8 +27,9 @@ Função para simular dados do modelo categórico
 j <- 5
 n <- 300
 k <- 4
-p.real <- 2
-beta.real <- matrix(
+true_p <- 2
+
+true_beta <- matrix(
   c(
     0.99, 0,
     0, 0.99,
@@ -36,17 +37,22 @@ beta.real <- matrix(
     0, 0.90,
     0.5, 0.5
   ),
-  nrow = j, ncol = p.real,
+  nrow = j, ncol = true_p,
   byrow = TRUE
 )
-Sigma <- diag(c(0.01, 0.05, 0.10, 0.15, 0.20), nrow = j, ncol = j)
-alfa.real <- matrix(
+
+true_sigma <- c(0.01, 0.05, 0.10, 0.15, 0.20)
+
+true_alfa <- matrix(
   c(-Inf, qnorm(0.4), qnorm(0.75), qnorm(0.9), Inf),
   nrow = j, ncol = (k + 1),
   byrow = TRUE
 )
-f.real <- t(MASS::mvrnorm(n, rep(0, p.real), diag(1, p.real, p.real)))
 
-y <- data_sim(beta.real, Sigma, alfa.real, f.real, link = "probit")
+true_f <- t(
+  MASS::mvrnorm(n, rep(0, true_p), diag(1, true_p, true_p))
+)
+
+y <- data_sim(true_beta, true_sigma, true_alfa, true_f, link = "probit")
 
 }

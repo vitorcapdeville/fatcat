@@ -8,12 +8,15 @@ fitfatcat(
   y,
   p,
   nit,
+  burnin = nit * 0.1,
+  lag = (nit - burnin) * 0.01,
   init_beta = 0.5,
   init_sigma2 = 2,
   sdpropbeta = 0.05,
   sdpropbeta2 = 0.075,
   sdpropf = 0.4,
-  sdpropsigma2 = 0.075
+  sdpropsigma2 = 0.075,
+  dist = c("probit", "logit")
 )
 }
 \arguments{
@@ -22,6 +25,8 @@ fitfatcat(
 \item{p}{numero de fatores a serem usados no ajuste}
 
 \item{nit}{numero de interacoes}
+
+\item{lag}{pegar uma a cada `lag` interacoes, após burnin.}
 
 \item{init_beta}{valor inicial de beta}
 
@@ -34,6 +39,10 @@ fitfatcat(
 \item{sdpropf}{desvio padrao da proposta}
 
 \item{sdpropsigma2}{desvio padrao da proposta}
+
+\item{dist}{distribuição do erro. atualmente, probit ou logit.}
+
+\item{burin}{numero de interacoes iniciais a serem ignoradas}
 }
 \value{
 uma lista com as cadeias a posteriori
