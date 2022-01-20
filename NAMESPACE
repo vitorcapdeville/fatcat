@@ -2,7 +2,7 @@
 
 export(data_sim)
 export(fitfatcat)
-export(fitfatcat_R)
+export(plotfatcat)
 import(RcppTN)
 importFrom(Rcpp,sourceCpp)
 useDynLib(fatcat)
