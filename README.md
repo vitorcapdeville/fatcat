@@ -23,8 +23,6 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(fatcat)
-#> Loading required package: RcppTN
-# Genarate some fake data
 j <- 5
 n <- 300
 k <- 4
@@ -65,56 +63,38 @@ cor <- psych::polychoric(t(y))$rho
 corrplot::corrplot(cor, type = "upper")
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
-
 Fit the probit model to the simulated dataset.
 
 ``` r
 res <- fitfatcat(y, p = 2, nit = 5000, dist = "probit")
-#> Executado em 41.41 secs
 ```
 
 ``` r
 plotfatcat(res, true_f, "f")
-#> Plotting only res$f[,1:5,].
 ```
-
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
 ``` r
 plotfatcat(res, true_beta, "beta")
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
-
 ``` r
 plotfatcat(res, true_sigma, "sigma2")
 ```
-
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
 Try the same, but with logit link function.
 
 ``` r
 res <- fitfatcat(y, p = 2, nit = 5000, dist = "logit")
-#> Executado em 37.91 secs
 ```
 
 ``` r
 plotfatcat(res, true_f, "f")
-#> Plotting only res$f[,1:5,].
 ```
-
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
 ``` r
 plotfatcat(res, true_beta, "beta")
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
-
 ``` r
 plotfatcat(res, true_sigma, "sigma2")
 ```
-
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
