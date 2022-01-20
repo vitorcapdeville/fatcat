@@ -80,7 +80,7 @@ corrplot::corrplot(cor, type = "upper")
 Fit the probit model to the simulated dataset.
 
 ```{r}
-res <- fitfatcat(y, p = 2, nit = 5000, dist = "probit")
+res <- fitfatcat(y, p = 2, nit = 5000, dist = "probit", alfa = true_alfa[, 2:k])
 ```
 
 ```{r}

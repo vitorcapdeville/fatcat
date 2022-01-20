@@ -3,7 +3,7 @@
 #' @param y dados. deve ter dimensao jxn
 #' @param p numero de fatores a serem usados no ajuste
 #' @param nit numero de interacoes
-#' @param burin numero de interacoes iniciais a serem ignoradas
+#' @param burnin numero de interacoes iniciais a serem ignoradas
 #' @param lag pegar uma a cada `lag` interacoes, após burnin.
 #' @param init_beta valor inicial de beta
 #' @param init_sigma2 valor inicial de sigma2
@@ -12,13 +12,15 @@
 #' @param sdpropf desvio padrao da proposta
 #' @param sdpropsigma2 desvio padrao da proposta
 #' @param dist distribuição do erro. atualmente, probit ou logit.
+#' @param quiet se TRUE, impede o print do indicar de progresso
+#' @param alfa opcional, fornecer valores verdadeiros de alfa.
 #'
 #' @return uma lista com as cadeias a posteriori
 #'
 #' @import RcppTN
 #'
 #' @export
-fitfatcat <- function(y, p, nit, burnin = nit * 0.05, lag = 1, init_beta = 0.5, init_sigma2 = 2, sdpropbeta = 0.05, sdpropbeta2 = 0.075, sdpropf = 0.4, sdpropsigma2 = 0.075, dist = c("probit", "logit")) {
+fitfatcat <- function(y, p, nit, burnin = nit * 0.05, lag = 1, init_beta = 0.5, init_sigma2 = 2, sdpropbeta = 0.05, sdpropbeta2 = 0.075, sdpropf = 0.4, sdpropsigma2 = 0.075, dist = c("probit", "logit"), quiet = F, alfa = NULL) {
   # Definicoes e valores iniciais
   dist <- match.arg(dist)
   j <- nrow(y)
@@ -29,14 +31,14 @@ fitfatcat <- function(y, p, nit, burnin = nit * 0.05, lag = 1, init_beta = 0.5, 
   beta[1, 1, 1] <- init_beta
   sigma2[, 1] <- rep(init_sigma2, j)
   f[, , 1] <- matrix(0, nrow = p, ncol = n)
-  alfa <- psych::polychoric(t(y))$tau
+  if(is.null(alfa)) alfa <- psych::polychoric(t(y))$tau
 
   # Algoritmo
   tempo1 <- Sys.time()
   if (dist == "probit") {
-    res <- algoritmo_probit(y, nit, beta, sigma2, f, alfa, sdpropbeta, sdpropbeta2, sdpropf, sdpropsigma2, n, p, j)
+    res <- algoritmo_probit(y, nit, beta, sigma2, f, alfa, sdpropbeta, sdpropbeta2, sdpropf, sdpropsigma2, n, p, j, !quiet)
   } else {
-    res <- algoritmo_logit(y, nit, beta, sigma2, f, alfa, sdpropbeta, sdpropbeta2, sdpropf, sdpropsigma2, n, p, j)
+    res <- algoritmo_logit(y, nit, beta, sigma2, f, alfa, sdpropbeta, sdpropbeta2, sdpropf, sdpropsigma2, n, p, j, !quiet)
   }
 
   trim <- trunc(seq(from = burnin + 1, to = nit, by = lag))

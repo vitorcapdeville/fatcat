@@ -2,8 +2,8 @@
 
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(RcppTN)]]
-// [[Rcpp::plugins("cpp11")]]
 // [[Rcpp::depends(RcppProgress)]]
+// [[Rcpp::plugins("cpp11")]]
 
 #include "RcppArmadillo.h"
 #include "RcppTN.h"

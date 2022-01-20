@@ -42,7 +42,7 @@ plotfatcat <- function(res, true_values = NULL, name = c("beta", "f", "sigma2"))
     lapply(
       indices,
       function(x) {
-        col_ind <- floor((x + 1) / dim(res)[1])
+        col_ind <- floor((x - 1) / dim(res)[1]) + 1
         row_ind <- x - dim(res)[1] * (col_ind - 1)
         plot_chain(
           res[seq(from = x, to = size_total, by = size_it)],
