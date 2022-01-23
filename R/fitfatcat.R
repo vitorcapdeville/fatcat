@@ -50,9 +50,9 @@ fitfatcat <- function(y, q, nit, burnin = 0, lag = 1, init_beta = 0.5, init_sigm
   # }
 
   trim <- trunc(seq(from = burnin + 1, to = min(nit,dim(res$beta)[3]), by = lag))
-  res$beta <- res$beta[, , trim]
-  res$sigma2 <- res$sigma2[, trim]
-  res$f <- res$f[, , trim]
+  res$beta <- res$beta[, , trim, drop = F]
+  res$sigma2 <- res$sigma2[, trim, drop = F]
+  res$f <- res$f[, , trim, drop = F]
 
   tempo2 <- Sys.time()
 
