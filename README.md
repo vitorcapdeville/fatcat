@@ -52,7 +52,11 @@ true_f <- t(
   MASS::mvrnorm(n, rep(0, true_p), diag(1, true_p, true_p))
 )
 
-y <- data_sim(true_beta, true_sigma, true_alpha, true_f, link = "probit")
+y <- data_sim(true_beta, true_sigma, true_alpha, f = true_f, link = "probit")
+y_marg <- data_sim(
+  beta = true_beta, sigma = true_sigma, 
+  alpha = true_alpha,
+  n = n, link = "probit", marginal = T)
 ```
 
 Note that variables 1 and 3 are highly correlated. The same happens for
@@ -60,21 +64,27 @@ variables 2 and 4.
 
 ``` r
 cor <- psych::polychoric(t(y))$rho
+cor_marg <- psych::polychoric(t(y_marg))$rho
 corrplot::corrplot(cor, type = "upper")
+corrplot::corrplot(cor_marg, type = "upper")
 ```
 
 Fit the probit model to the simulated dataset.
 
 ``` r
+set.seed(1)
 res <- fitfatcat(
-  y, q = 2, nit = 5000, dist = "probit", alpha = true_alpha,
-  C0 = 1000, a = 0.01, b = 0.01,
-  lag = 4, burnin = 500
+  y, q = 2, nit = 1000, dist = "probit", alpha = true_alpha, 
+  C0 = 10000, a = 0.01, b = 0.01, sdpropbeta = 0.025,
+  sdpropsigma2 = 0.04, sdpropf = 0.4, init_sigma2 = 0.5#,
+  # ,
+  # lag = 4, burnin = 500
 )
-```
 
-``` r
+
 plotfatcat(res, true_beta, "beta")
+
+plotfatcat(res, true_sigma, "sigma2")
 ```
 
 ``` r

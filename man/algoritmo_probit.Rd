@@ -11,7 +11,7 @@ algoritmo_probit(
   f,
   sigma2,
   alpha,
-  C0 = 10000,
+  C0 = 1e+05,
   a = 0.001,
   b = 0.001,
   sdpropbeta = 0.05,

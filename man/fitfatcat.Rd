@@ -12,7 +12,7 @@ fitfatcat(
   lag = 1,
   init_beta = 0.5,
   init_sigma2 = 2,
-  C0 = 10000,
+  C0 = 1e+05,
   a = 0.001,
   b = 0.001,
   sdpropbeta = 0.05,

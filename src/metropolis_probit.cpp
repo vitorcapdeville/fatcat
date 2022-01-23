@@ -28,12 +28,21 @@ arma::mat passo_beta_probit(arma::mat y, arma::mat alpha, arma::mat beta, arma::
   arma::rowvec betaprop(q);
   arma::vec auxvec(2);
 
+  // densidade da proposta no valor proposto, dado o valor corrente
+  double l_d_prop_cur_beta = 0;
+  // densidade da proposta no valor corrente, dado o valor proposto.
+  double l_d_cur_prop_beta = 0;
+
   for(int j=0; j <= p - 1; j++){
     for(int l=0; l <= q - 1; l++){
       betaprop(l) = R::rnorm(beta(j,l),sdpropbeta)*indica(j>l) + RcppTN::rtn1(beta(j,l),sdpropbeta2,0,R_PosInf)*indica(j==l);
+      if(j==l){
+        l_d_prop_cur_beta = log(RcppTN::dtn1(betaprop(l), beta(j,l),sdpropbeta2,0,R_PosInf));
+        l_d_cur_prop_beta = log(RcppTN::dtn1(beta(j,l), betaprop(l),sdpropbeta2,0,R_PosInf));
+      }
     }
-    A1 = l_vero_j_probit(y.row(j), alpha.row(j), betaprop,    f, sigma2(j)) + l_priori_beta_j(betaprop,    j, C0);
-    A2 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2(j)) + l_priori_beta_j(beta.row(j), j, C0);
+    A1 = l_vero_j_probit(y.row(j), alpha.row(j), betaprop,    f, sigma2(j)) + l_priori_beta_j(betaprop,    j, C0) + l_d_cur_prop_beta;
+    A2 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2(j)) + l_priori_beta_j(beta.row(j), j, C0) + l_d_prop_cur_beta;
     A  = std::exp(A1 - A2);
     auxvec = {1.0,A};
     pa = min(auxvec);
@@ -63,8 +72,9 @@ arma::colvec passo_sigma2_probit(arma::mat y, arma::mat alpha, arma::mat beta, a
 
   for(int j=0; j <= p-1; j++){
     sigma2prop = RcppTN::rtn1(sigma2(j),sdpropsigma2,0,R_PosInf);
-    A1 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2prop) + l_priori_sigma2_j(sigma2prop, a, b);
-    A2 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2(j))  + l_priori_sigma2_j(sigma2(j) , a, b);
+    // sigma2prop = R::rnorm(sigma2(j),sdpropsigma2);
+    A1 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2prop) + l_priori_sigma2_j(sigma2prop, a, b) + log(RcppTN::dtn1(sigma2(j), sigma2prop, sdpropsigma2,0,R_PosInf));
+    A2 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2(j))  + l_priori_sigma2_j(sigma2(j) , a, b) + log(RcppTN::dtn1(sigma2prop, sigma2(j), sdpropsigma2,0,R_PosInf));
     A  = std::exp(A1 - A2);
     auxvec = {1.0,A};
     pa = min(auxvec);
@@ -99,8 +109,8 @@ arma::mat passo_f_probit(arma::mat y, arma::mat alpha, arma::mat beta, arma::mat
     }
     // aux6 = Rcpp::rnorm(q)*sdpropf;
     // fprop = f.col(i) + aux6;
-    A1 = l_vero_i_probit(y.col(i), alpha, beta, fprop, sigma2)    + l_priori_f_i(fprop);//logcondcompfiProbit(fprop,beta,alpha,sigma2, y,i + 1);
-    A2 = l_vero_i_probit(y.col(i), alpha, beta, f.col(i), sigma2) + l_priori_f_i(f.col(i));//logcondcompfiProbit(f.col(i),beta,alpha,sigma2,y,i + 1);
+    A1 = l_vero_i_probit(y.col(i), alpha, beta, fprop,    sigma2) + l_priori_f_i(fprop);
+    A2 = l_vero_i_probit(y.col(i), alpha, beta, f.col(i), sigma2) + l_priori_f_i(f.col(i));
     A  = std::exp(A1 - A2);
     auxvec = {1.0,A};
     pa = min(auxvec);
@@ -130,7 +140,7 @@ arma::mat passo_f_probit(arma::mat y, arma::mat alpha, arma::mat beta, arma::mat
 //' @export
 // [[Rcpp::export]]
 List algoritmo_probit(arma::mat y, int nit , arma::mat beta, arma::mat f, arma::colvec sigma2, arma::mat alpha,
-                      double C0 = 10000, double a = 0.001, double b = 0.001,
+                      double C0 = 100000, double a = 0.001, double b = 0.001,
                       double sdpropbeta = 0.05, double sdpropbeta2 = 0.075, double sdpropf = 0.4, double sdpropsigma2 = 0.05,
                       bool display_progress = true){
 

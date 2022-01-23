@@ -22,7 +22,7 @@
 #' @import RcppTN
 #'
 #' @export
-fitfatcat <- function(y, q, nit, burnin = 0, lag = 1, init_beta = 0.5, init_sigma2 = 2, C0 = 10000, a = 0.001, b = 0.001, sdpropbeta = 0.05, sdpropbeta2 = 0.075, sdpropf = 0.4, sdpropsigma2 = 0.075, dist = c("probit", "logit"), quiet = F, alpha = NULL) {
+fitfatcat <- function(y, q, nit, burnin = 0, lag = 1, init_beta = 0.5, init_sigma2 = 2, C0 = 100000, a = 0.001, b = 0.001, sdpropbeta = 0.05, sdpropbeta2 = 0.075, sdpropf = 0.4, sdpropsigma2 = 0.075, dist = c("probit", "logit"), quiet = F, alpha = NULL) {
   # Definicoes e valores iniciais
   dist <- match.arg(dist)
   if (dist != "probit") stop("Distribuicao logistica em construcao.")

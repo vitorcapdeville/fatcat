@@ -2,9 +2,17 @@
 % Please edit documentation in R/data_sim.R
 \name{data_sim}
 \alias{data_sim}
-\title{Função para simular dados do modelo categórico}
+\title{Funcao para simular dados do modelo categórico}
 \usage{
-data_sim(beta, sigma, alpha, f, link = c("probit", "logit"))
+data_sim(
+  beta,
+  sigma,
+  alpha,
+  n = NULL,
+  f = NULL,
+  link = c("probit", "logit"),
+  marginal = F
+)
 }
 \arguments{
 \item{beta}{matriz jxp}
@@ -13,15 +21,19 @@ data_sim(beta, sigma, alpha, f, link = c("probit", "logit"))
 
 \item{alpha}{matriz j x (k+1)}
 
+\item{n}{numero de observacoes a serem gerados}
+
 \item{f}{matriz pxn}
 
 \item{link}{probit ou logit}
+
+\item{marginal}{indica se deve usar a distribuicao de y|f ou a distribuicao de y.}
 }
 \value{
 matriz jxn
 }
 \description{
-Função para simular dados do modelo categórico
+Funcao para simular dados do modelo categórico
 }
 \examples{
 j <- 5
@@ -53,6 +65,6 @@ true_f <- t(
   MASS::mvrnorm(n, rep(0, true_p), diag(1, true_p, true_p))
 )
 
-y <- data_sim(true_beta, true_sigma, true_alpha, true_f, link = "probit")
+y <- data_sim(beta = true_beta, sigma = true_sigma, alpha = true_alpha, f = true_f, link = "probit")
 
 }
