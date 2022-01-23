@@ -4,8 +4,10 @@ plot_chain <- function(chain, true_value = NULL, ylab = "") {
     ggplot2::ylab(ylab) +
     ggplot2::theme_bw() +
     ggplot2::geom_line(ggplot2::aes(y = chain)) +
-    if (!is.null(true_value) & !is.na(true_value)) {
-      ggplot2::geom_line(ggplot2::aes(y = true_value), color = "red")
+    if (!is.null(true_value)) {
+      if (!is.na(true_value)) {
+        ggplot2::geom_line(ggplot2::aes(y = true_value), color = "red")
+      }
     } else {
       NULL
     }
@@ -29,7 +31,7 @@ plotfatcat <- function(res, true_values = NULL, name = c("beta", "f", "sigma2"))
     res <- res[, 1:5, ]
     true_values <- true_values[, 1:5]
     message("Plotting only res$f[,1:5,].")
-  } else if (name == "beta") {
+  } else if (name == "beta" & !is.null(true_values)) {
     if (dim(res)[2] > dim(true_values)[2]) {
       message("Matching 'true values' with the fisrt p columns of beta, since true_p > p.")
     }

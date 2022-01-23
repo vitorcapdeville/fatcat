@@ -42,7 +42,7 @@ true_beta <- matrix(
 
 true_sigma <- c(0.01, 0.05, 0.10, 0.15, 0.20)
 
-true_alfa <- matrix(
+true_alpha <- matrix(
   c(-Inf, qnorm(0.4), qnorm(0.75), qnorm(0.9), Inf),
   nrow = j, ncol = (k + 1),
   byrow = TRUE
@@ -52,7 +52,7 @@ true_f <- t(
   MASS::mvrnorm(n, rep(0, true_p), diag(1, true_p, true_p))
 )
 
-y <- data_sim(true_beta, true_sigma, true_alfa, true_f, link = "probit")
+y <- data_sim(true_beta, true_sigma, true_alpha, true_f, link = "probit")
 ```
 
 Note that variables 1 and 3 are highly correlated. The same happens for
@@ -66,29 +66,11 @@ corrplot::corrplot(cor, type = "upper")
 Fit the probit model to the simulated dataset.
 
 ``` r
-res <- fitfatcat(y, p = 2, nit = 5000, dist = "probit", alfa = true_alfa[, 2:k])
-```
-
-``` r
-plotfatcat(res, true_f, "f")
-```
-
-``` r
-plotfatcat(res, true_beta, "beta")
-```
-
-``` r
-plotfatcat(res, true_sigma, "sigma2")
-```
-
-Try the same, but with logit link function.
-
-``` r
-res <- fitfatcat(y, p = 2, nit = 5000, dist = "logit")
-```
-
-``` r
-plotfatcat(res, true_f, "f")
+res <- fitfatcat(
+  y, q = 2, nit = 5000, dist = "probit", alpha = true_alpha,
+  C0 = 1000, a = 0.01, b = 0.01,
+  lag = 4, burnin = 500
+)
 ```
 
 ``` r
@@ -96,5 +78,23 @@ plotfatcat(res, true_beta, "beta")
 ```
 
 ``` r
+plotfatcat(res, true_f, "f")
+```
+
+``` r
 plotfatcat(res, true_sigma, "sigma2")
 ```
+
+<!-- Try the same, but with logit link function. -->
+<!-- ```{r} -->
+<!-- res <- fitfatcat(y, p = 2, nit = 5000, dist = "logit") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- plotfatcat(res, true_f, "f") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- plotfatcat(res, true_beta, "beta") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- plotfatcat(res, true_sigma, "sigma2") -->
+<!-- ``` -->

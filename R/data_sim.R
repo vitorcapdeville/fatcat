@@ -2,7 +2,7 @@
 #'
 #' @param beta matriz jxp
 #' @param sigma vetor com a diagonal da matriz de variancias, tamanho j
-#' @param alfa matriz j x (k+1)
+#' @param alpha matriz j x (k+1)
 #' @param f matriz pxn
 #' @param link probit ou logit
 #'
@@ -28,7 +28,7 @@
 #'
 #' true_sigma <- c(0.01, 0.05, 0.10, 0.15, 0.20)
 #'
-#' true_alfa <- matrix(
+#' true_alpha <- matrix(
 #'   c(-Inf, qnorm(0.4), qnorm(0.75), qnorm(0.9), Inf),
 #'   nrow = j, ncol = (k + 1),
 #'   byrow = TRUE
@@ -38,19 +38,19 @@
 #'   MASS::mvrnorm(n, rep(0, true_p), diag(1, true_p, true_p))
 #' )
 #'
-#' y <- data_sim(true_beta, true_sigma, true_alfa, true_f, link = "probit")
+#' y <- data_sim(true_beta, true_sigma, true_alpha, true_f, link = "probit")
 #'
 #' @export
 #'
-data_sim <- function(beta, sigma, alfa, f, link = c("probit", "logit")) {
+data_sim <- function(beta, sigma, alpha, f, link = c("probit", "logit")) {
   Sigma <- diag(sigma)
-  stopifnot(nrow(beta) == nrow(alfa))
+  stopifnot(nrow(beta) == nrow(alpha))
   stopifnot(ncol(beta) == nrow(f))
   stopifnot(nrow(Sigma) == ncol(Sigma))
   stopifnot(nrow(beta) == ncol(Sigma))
   j <- nrow(beta)
   n <- ncol(f)
-  k <- ncol(alfa) - 1
+  k <- ncol(alpha) - 1
 
   # Para a geracao logit
   s <- sqrt(diag(Sigma) * 3 / (pi^2))
@@ -68,7 +68,7 @@ data_sim <- function(beta, sigma, alfa, f, link = c("probit", "logit")) {
   for (l in 1:j) {
     for (i in 1:n) {
       for (s in 1:k) {
-        if (y_star[l, i] >= alfa[l, s] && y_star[l, i] < alfa[l, s + 1]) {
+        if (y_star[l, i] >= alpha[l, s] && y_star[l, i] < alpha[l, s + 1]) {
           y[l, i] <- s
         }
       }

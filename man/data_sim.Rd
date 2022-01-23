@@ -4,14 +4,14 @@
 \alias{data_sim}
 \title{Função para simular dados do modelo categórico}
 \usage{
-data_sim(beta, sigma, alfa, f, link = c("probit", "logit"))
+data_sim(beta, sigma, alpha, f, link = c("probit", "logit"))
 }
 \arguments{
 \item{beta}{matriz jxp}
 
 \item{sigma}{vetor com a diagonal da matriz de variancias, tamanho j}
 
-\item{alfa}{matriz j x (k+1)}
+\item{alpha}{matriz j x (k+1)}
 
 \item{f}{matriz pxn}
 
@@ -43,7 +43,7 @@ true_beta <- matrix(
 
 true_sigma <- c(0.01, 0.05, 0.10, 0.15, 0.20)
 
-true_alfa <- matrix(
+true_alpha <- matrix(
   c(-Inf, qnorm(0.4), qnorm(0.75), qnorm(0.9), Inf),
   nrow = j, ncol = (k + 1),
   byrow = TRUE
@@ -53,6 +53,6 @@ true_f <- t(
   MASS::mvrnorm(n, rep(0, true_p), diag(1, true_p, true_p))
 )
 
-y <- data_sim(true_beta, true_sigma, true_alfa, true_f, link = "probit")
+y <- data_sim(true_beta, true_sigma, true_alpha, true_f, link = "probit")
 
 }

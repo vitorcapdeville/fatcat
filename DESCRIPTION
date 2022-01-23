@@ -11,9 +11,12 @@ LazyData: true
 Imports: 
     ggplot2,
     glue,
+    invgamma,
     MASS,
+    mvtnorm,
     patchwork,
     psych,
+    purrr,
     Rcpp (>= 1.0.8),
     stats,
     truncnorm,

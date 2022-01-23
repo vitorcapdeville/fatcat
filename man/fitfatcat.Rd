@@ -6,25 +6,28 @@
 \usage{
 fitfatcat(
   y,
-  p,
+  q,
   nit,
-  burnin = nit * 0.05,
+  burnin = 0,
   lag = 1,
   init_beta = 0.5,
   init_sigma2 = 2,
+  C0 = 10000,
+  a = 0.001,
+  b = 0.001,
   sdpropbeta = 0.05,
   sdpropbeta2 = 0.075,
   sdpropf = 0.4,
   sdpropsigma2 = 0.075,
   dist = c("probit", "logit"),
   quiet = F,
-  alfa = NULL
+  alpha = NULL
 )
 }
 \arguments{
 \item{y}{dados. deve ter dimensao jxn}
 
-\item{p}{numero de fatores a serem usados no ajuste}
+\item{q}{numero de fatores a serem usados no ajuste}
 
 \item{nit}{numero de interacoes}
 
@@ -35,6 +38,10 @@ fitfatcat(
 \item{init_beta}{valor inicial de beta}
 
 \item{init_sigma2}{valor inicial de sigma2}
+
+\item{C0}{variância das prioris para beta}
+
+\item{a, b}{parametros de shape e scale da priori de sigma2}
 
 \item{sdpropbeta}{desvio padrao da proposta}
 
@@ -48,7 +55,7 @@ fitfatcat(
 
 \item{quiet}{se TRUE, impede o print do indicar de progresso}
 
-\item{alfa}{opcional, fornecer valores verdadeiros de alfa.}
+\item{alpha}{opcional, fornecer valores verdadeiros de alpha.}
 }
 \value{
 uma lista com as cadeias a posteriori
