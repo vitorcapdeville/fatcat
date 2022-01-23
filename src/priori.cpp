@@ -34,9 +34,13 @@ using namespace Rcpp;
 double l_priori_beta_jl(double beta, int j, int l, double C0 = 10000){
   double aux;
   if (l <= j) {
+    // Nucleo da normal e da normal truncada no 0 é o mesmo (truncar no 0 = dividir por 0.5, se a media e 0)
+    // O certo aqui era ter um outro if pra l == j e dizer que se l == j e beta < 0, entao a densidade
+    // é zero, mas, pra ser mais eficiente, eu posso não fazer esse if e garantir que se l == j eu não vou
+    // propor beta negativo.
     aux =  (-1/(2 * C0))*std::pow(beta, 2);
   } else {
-    aux = 0.0; // Se j > l, beta_jl = 0 com prob 1.
+    aux = 0.0; // Se j > l, beta_jl = 0 com prob 1. log(1) = 0
   }
   return aux;
 }
@@ -147,6 +151,8 @@ double l_priori_f(arma::mat f){
 //' @export
 // [[Rcpp::export]]
 double l_priori_sigma2_j (double sigma2, double a = 0.001, double b = 0.001){
+  // Essa priori deveria ter um if dizendo q se sigma2 < 0 a densidade e zero, mas isso
+  // pode ser evitado se nunca sera proposto sigma2 < 0.
   double aux = (- a - 1) * std::log(sigma2) - b/sigma2;
   return aux;
 }

@@ -37,12 +37,16 @@ arma::mat passo_beta_probit(arma::mat y, arma::mat alpha, arma::mat beta, arma::
     for(int l=0; l <= q - 1; l++){
       betaprop(l) = R::rnorm(beta(j,l),sdpropbeta)*indica(j>l) + RcppTN::rtn1(beta(j,l),sdpropbeta2,0,R_PosInf)*indica(j==l);
       if(j==l){
+        // Normal é simetrica, entao dnorm(betaprop, beta) = dnorm(beta, betaprop).
+        // normal truncada nao, entao preciso avaliar a densidade qnd tiver na truncada.
         l_d_prop_cur_beta = log(RcppTN::dtn1(betaprop(l), beta(j,l),sdpropbeta2,0,R_PosInf));
         l_d_cur_prop_beta = log(RcppTN::dtn1(beta(j,l), betaprop(l),sdpropbeta2,0,R_PosInf));
       }
     }
-    A1 = l_vero_j_probit(y.row(j), alpha.row(j), betaprop,    f, sigma2(j)) + l_priori_beta_j(betaprop,    j, C0) + l_d_cur_prop_beta;
-    A2 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2(j)) + l_priori_beta_j(beta.row(j), j, C0) + l_d_prop_cur_beta;
+    // Preciso de j + 1 aqui por na funcao da priori de beta eu estou variando l de 1 ate q. Entao para comparar j e l,
+    // preciso comecar o j de 1 tb (ou comecar o l de zero la.)
+    A1 = l_vero_j_probit(y.row(j), alpha.row(j), betaprop,    f, sigma2(j)) + l_priori_beta_j(betaprop,    j + 1, C0) + l_d_cur_prop_beta;
+    A2 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2(j)) + l_priori_beta_j(beta.row(j), j + 1, C0) + l_d_prop_cur_beta;
     A  = std::exp(A1 - A2);
     auxvec = {1.0,A};
     pa = min(auxvec);
@@ -72,7 +76,6 @@ arma::colvec passo_sigma2_probit(arma::mat y, arma::mat alpha, arma::mat beta, a
 
   for(int j=0; j <= p-1; j++){
     sigma2prop = RcppTN::rtn1(sigma2(j),sdpropsigma2,0,R_PosInf);
-    // sigma2prop = R::rnorm(sigma2(j),sdpropsigma2);
     A1 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2prop) + l_priori_sigma2_j(sigma2prop, a, b) + log(RcppTN::dtn1(sigma2(j), sigma2prop, sdpropsigma2,0,R_PosInf));
     A2 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2(j))  + l_priori_sigma2_j(sigma2(j) , a, b) + log(RcppTN::dtn1(sigma2prop, sigma2(j), sdpropsigma2,0,R_PosInf));
     A  = std::exp(A1 - A2);
@@ -163,7 +166,6 @@ List algoritmo_probit(arma::mat y, int nit , arma::mat beta, arma::mat f, arma::
   ETAProgressBar pb;
   Progress pro(nit, display_progress,pb);
 
-  // Progress pro(nit, display_progress);
   for(int it=1; it <= nit-1;it++){
 
     if (Progress::check_abort()){
@@ -175,13 +177,13 @@ List algoritmo_probit(arma::mat y, int nit , arma::mat beta, arma::mat f, arma::
 
     pro.increment();
 
-    chain_beta.slice(it) = passo_beta_probit(y, alpha, chain_beta.slice(it-1), chain_f.slice(it-1), chain_sigma2.col(it-1), C0, sdpropbeta, sdpropbeta2);
+    chain_beta.slice(it) = passo_beta_probit(y  , alpha, chain_beta.slice(it-1), chain_f.slice(it-1), chain_sigma2.col(it-1), C0, sdpropbeta, sdpropbeta2);
     // chain_beta.slice(it) = beta;
 
-    chain_sigma2.col(it) = passo_sigma2_probit(y, alpha, chain_beta.slice(it), chain_f.slice(it-1), chain_sigma2.col(it-1), a, b, sdpropsigma2);
+    chain_sigma2.col(it) = passo_sigma2_probit(y, alpha, chain_beta.slice(it)  , chain_f.slice(it-1), chain_sigma2.col(it-1), a, b, sdpropsigma2);
     // chain_sigma2.col(it) = sigma2;
 
-    chain_f.slice(it) = passo_f_probit(y, alpha, chain_beta.slice(it), chain_f.slice(it-1), chain_sigma2.col(it), sdpropf);
+    chain_f.slice(it) = passo_f_probit(y,         alpha, chain_beta.slice(it)  , chain_f.slice(it-1), chain_sigma2.col(it)  , sdpropf);
     // chain_f.slice(it) = f;
   }
   chain_export_beta = chain_beta.tail_slices(nit - 1);

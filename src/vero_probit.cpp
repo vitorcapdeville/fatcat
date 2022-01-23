@@ -100,6 +100,7 @@ double l_vero_j_probit(arma::rowvec y,arma::rowvec alpha, arma::rowvec beta, arm
   return sum;
 }
 
+// Essa aqui tá errada. Quando não estou condicionando em f, as variáveis não são independentes
 // [[Rcpp::export]]
 double l_vero_j_marginal_probit(arma::rowvec y,arma::rowvec alpha, arma::rowvec beta, double sigma2){
   int n = y.size();
@@ -159,7 +160,7 @@ double l_vero_probit(arma::mat y,arma::mat alpha, arma::mat beta, arma::mat f, a
   }
   return sum;
 }
-
+// Essa aqui tá errada. Quando não estou condicionando em f, as variáveis não são independentes
 // [[Rcpp::export]]
 double l_vero_marginal_probit(arma::mat y,arma::mat alpha, arma::mat beta, arma::colvec sigma2){
   int p = y.n_rows;

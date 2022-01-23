@@ -1,4 +1,4 @@
-#' Funcao para simular dados do modelo categórico
+#' Funcao para simular dados do modelo categorico
 #'
 #' @param beta matriz jxp
 #' @param sigma vetor com a diagonal da matriz de variancias, tamanho j
@@ -47,7 +47,7 @@
 data_sim <- function(beta, sigma, alpha, n = NULL, f = NULL, link = c("probit", "logit"), marginal = F) {
   Sigma <- diag(sigma)
   if (!marginal & is.null(f)) stop("Forneca f ou use a geracao marginal.")
-  if (marginal & !is.null(f)) warning("Foi fornecido f, mas marginal está como T. Os dados
+  if (marginal & !is.null(f)) warning("Foi fornecido f, mas marginal esta como TRUE. Os dados
                                       serao gerados sem utilizar f.")
 
   if (marginal & is.null(n)) stop("Para o metodo marginal, forneca n.")

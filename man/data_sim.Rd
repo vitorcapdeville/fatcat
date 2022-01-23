@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_sim.R
 \name{data_sim}
 \alias{data_sim}
-\title{Funcao para simular dados do modelo categórico}
+\title{Funcao para simular dados do modelo categorico}
 \usage{
 data_sim(
   beta,
@@ -33,7 +33,7 @@ data_sim(
 matriz jxn
 }
 \description{
-Funcao para simular dados do modelo categórico
+Funcao para simular dados do modelo categorico
 }
 \examples{
 j <- 5
