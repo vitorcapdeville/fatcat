@@ -87,18 +87,19 @@ Fit the probit model to the simulated dataset.
 
 ```{r}
 set.seed(1)
+# Ainda ta meio autocorrelacioanda. 
 res <- fitfatcat(
-  y, q = 2, nit = 1000, dist = "probit", alpha = true_alpha, 
-  C0 = 10000, a = 0.01, b = 0.01, sdpropbeta = 0.025,
-  sdpropsigma2 = 0.04, sdpropf = 0.4, init_sigma2 = 0.5#,
+  y, q = 2, nit = 10000, dist = "probit", alpha = true_alpha, 
+  C0 = 10, a = 0.01, b = 0.01, sdpropbeta = 0.035, sdpropbeta2 = 0.075,
+  sdpropsigma2 = 0.04, sdpropf = 0.4, init_sigma2 = 0.5,
   # ,
-  # lag = 4, burnin = 500
+  lag = 9, burnin = 1000
 )
 
 
 plotfatcat(res, true_beta, "beta")
 
-plotfatcat(res, true_sigma, "sigma2")
+# plotfatcat(res, true_sigma, "sigma2")
 ```
 
 ```{r}

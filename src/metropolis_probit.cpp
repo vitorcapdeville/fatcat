@@ -25,38 +25,63 @@ arma::mat passo_beta_probit(arma::mat y, arma::mat alpha, arma::mat beta, arma::
   int q = beta.n_cols;
 
   arma::mat ret(p,q);
-  arma::rowvec betaprop(q);
   arma::vec auxvec(2);
 
   // densidade da proposta no valor proposto, dado o valor corrente
   double l_d_prop_cur_beta = 0;
   // densidade da proposta no valor corrente, dado o valor proposto.
   double l_d_cur_prop_beta = 0;
-
-  for(int j=0; j <= p - 1; j++){
-    for(int l=0; l <= q - 1; l++){
-      betaprop(l) = R::rnorm(beta(j,l),sdpropbeta)*indica(j>l) + RcppTN::rtn1(beta(j,l),sdpropbeta2,0,R_PosInf)*indica(j==l);
+  arma::mat betaprop(p, q);
+  for(int l=0; l <= q - 1; l++){
+    for(int j=0; j <= p - 1; j++){
+      betaprop(j,l) = R::rnorm(beta(j,l),sdpropbeta)*indica(j>l) + RcppTN::rtn1(beta(j,l),sdpropbeta2,0,R_PosInf)*indica(j==l);
       if(j==l){
         // Normal é simetrica, entao dnorm(betaprop, beta) = dnorm(beta, betaprop).
         // normal truncada nao, entao preciso avaliar a densidade qnd tiver na truncada.
-        l_d_prop_cur_beta = log(RcppTN::dtn1(betaprop(l), beta(j,l),sdpropbeta2,0,R_PosInf));
-        l_d_cur_prop_beta = log(RcppTN::dtn1(beta(j,l), betaprop(l),sdpropbeta2,0,R_PosInf));
+        l_d_prop_cur_beta += log(RcppTN::dtn1(betaprop(j,l), beta(j,l),sdpropbeta2,0,R_PosInf));
+        l_d_cur_prop_beta += log(RcppTN::dtn1(beta(j,l), betaprop(j,l),sdpropbeta2,0,R_PosInf));
       }
     }
-    // Preciso de j + 1 aqui por na funcao da priori de beta eu estou variando l de 1 ate q. Entao para comparar j e l,
-    // preciso comecar o j de 1 tb (ou comecar o l de zero la.)
-    A1 = l_vero_j_probit(y.row(j), alpha.row(j), betaprop,    f, sigma2(j)) + l_priori_beta_j(betaprop,    j + 1, C0) + l_d_cur_prop_beta;
-    A2 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2(j)) + l_priori_beta_j(beta.row(j), j + 1, C0) + l_d_prop_cur_beta;
-    A  = std::exp(A1 - A2);
-    auxvec = {1.0,A};
-    pa = min(auxvec);
-    u = R::runif(0.0,1.0);
-    if(u < pa){
-      ret.row(j) = betaprop;
-    }else{
-      ret.row(j) = beta.row(j);
-    }
   }
+  A1 = l_vero_probit(y, alpha, betaprop, f, sigma2) + l_priori_beta(betaprop, C0) + l_d_cur_prop_beta;
+  A2 = l_vero_probit(y, alpha, beta, f, sigma2) + l_priori_beta(beta, C0) + l_d_prop_cur_beta;
+  A  = std::exp(A1 - A2);
+  auxvec = {1.0,A};
+  pa = min(auxvec);
+  u = R::runif(0.0,1.0);
+  if(u < pa){
+    ret = betaprop;
+  }else{
+    ret = beta;
+  }
+
+
+
+  // arma::rowvec betaprop(q);
+  // for(int j=0; j <= p - 1; j++){
+  //   for(int l=0; l <= q - 1; l++){
+  //     betaprop(l) = R::rnorm(beta(j,l),sdpropbeta)*indica(j>l) + RcppTN::rtn1(beta(j,l),sdpropbeta2,0,R_PosInf)*indica(j==l);
+  //     if(j==l){
+  //       // Normal é simetrica, entao dnorm(betaprop, beta) = dnorm(beta, betaprop).
+  //       // normal truncada nao, entao preciso avaliar a densidade qnd tiver na truncada.
+  //       l_d_prop_cur_beta = log(RcppTN::dtn1(betaprop(l), beta(j,l),sdpropbeta2,0,R_PosInf));
+  //       l_d_cur_prop_beta = log(RcppTN::dtn1(beta(j,l), betaprop(l),sdpropbeta2,0,R_PosInf));
+  //     }
+  //   }
+  //   // Preciso de j + 1 aqui por na funcao da priori de beta eu estou variando l de 1 ate q. Entao para comparar j e l,
+  //   // preciso comecar o j de 1 tb (ou comecar o l de zero la.)
+  //   A1 = l_vero_j_probit(y.row(j), alpha.row(j), betaprop,    f, sigma2(j)) + l_priori_beta_j(betaprop,    j + 1, C0) + l_d_cur_prop_beta;
+  //   A2 = l_vero_j_probit(y.row(j), alpha.row(j), beta.row(j), f, sigma2(j)) + l_priori_beta_j(beta.row(j), j + 1, C0) + l_d_prop_cur_beta;
+  //   A  = std::exp(A1 - A2);
+  //   auxvec = {1.0,A};
+  //   pa = min(auxvec);
+  //   u = R::runif(0.0,1.0);
+  //   if(u < pa){
+  //     ret.row(j) = betaprop;
+  //   }else{
+  //     ret.row(j) = beta.row(j);
+  //   }
+  // }
   return ret;
 }
 
