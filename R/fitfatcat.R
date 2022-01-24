@@ -33,9 +33,9 @@ fitfatcat <- function(y, q, nit, burnin = 0, lag = 1, init_beta = 0.5, init_sigm
   beta <- array(0, dim = c(p, q))
   sigma2 <- array(NA, dim = c(p))
   f <- array(NA, dim = c(q, n))
-  beta[1, 1] <- init_beta
+  beta[, 1] <- init_beta
   sigma2 <- rep(init_sigma2, p)
-  f <- matrix(0, nrow = q, ncol = n)
+  f <- matrix(0.5, nrow = q, ncol = n)
 
   if (is.null(alpha)) alpha <- cbind(-Inf,psych::polychoric(t(y))$tau, Inf)
 

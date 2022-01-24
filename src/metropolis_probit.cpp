@@ -102,10 +102,29 @@ arma::mat passo_f_probit(arma::mat y, arma::mat alpha, arma::mat beta, arma::mat
   int n = f.n_cols;
 
   arma::mat ret(q,n);
-  arma::colvec fprop(q);
   // arma::colvec aux6(q);
   NumericVector auxvec(2);
+//
+//   arma::mat fprop(q, n);
+//   for (int l = 0; l <= q - 1; l++){
+//     for(int i = 0; i <= n - 1; i++) {
+//       fprop(l,i) = R::rnorm(f(l,i), sdpropf);
+//     }
+//   }
+//
+//   A1 = l_vero_probit(y, alpha, beta, fprop, sigma2) + l_priori_f(fprop);
+//   A2 = l_vero_probit(y, alpha, beta, f, sigma2) + l_priori_f(f);
+//   A  = std::exp(A1 - A2);
+//   auxvec = {1.0,A};
+//   pa = min(auxvec);
+//   u = R::runif(0.0,1.0);
+//   if(u<pa){
+//     ret = fprop;
+//   }else{
+//     ret = f;
+//   }
 
+  arma::colvec fprop(q);
   for (int i = 0; i <= n - 1; i++) {
     for (int l = 0; l <= q - 1; l++){
       fprop(l) = R::rnorm(f(l,i), sdpropf);

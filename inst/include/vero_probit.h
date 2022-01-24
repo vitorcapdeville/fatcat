@@ -9,5 +9,6 @@ double l_vero_probit(arma::mat y,arma::mat alpha, arma::mat beta, arma::mat f, a
 double l_priori_beta_j(arma::rowvec beta, int j, double C0 = 10000);
 double l_priori_sigma2_j (double sigma2, double a = 0.001, double b = 0.001);
 double l_priori_f_i(arma::colvec f);
+double l_priori_f(arma::mat f);
 
 #endif
