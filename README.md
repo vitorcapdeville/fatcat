@@ -23,6 +23,7 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(fatcat)
+#> Loading required package: RcppTN
 j <- 5
 n <- 300
 k <- 4
@@ -66,8 +67,15 @@ variables 2 and 4.
 cor <- psych::polychoric(t(y))$rho
 cor_marg <- psych::polychoric(t(y_marg))$rho
 corrplot::corrplot(cor, type = "upper")
+```
+
+<img src="man/figures/README-unnamed-chunk-1-1.png" width="100%" />
+
+``` r
 corrplot::corrplot(cor_marg, type = "upper")
 ```
+
+<img src="man/figures/README-unnamed-chunk-1-2.png" width="100%" />
 
 Fit the probit model to the simulated dataset.
 
@@ -81,20 +89,31 @@ res <- fitfatcat(
   # ,
   lag = 9, burnin = 1000
 )
+#> Executado em 26 secs
 
 
 plotfatcat(res, true_beta, "beta")
+```
+
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+
+``` r
 
 # plotfatcat(res, true_sigma, "sigma2")
 ```
 
 ``` r
 plotfatcat(res, true_f, "f")
+#> Plotting only res$f[,1:5,].
 ```
+
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
 ``` r
 plotfatcat(res, true_sigma, "sigma2")
 ```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
 <!-- Try the same, but with logit link function. -->
 <!-- ```{r} -->

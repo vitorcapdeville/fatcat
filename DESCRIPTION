@@ -25,3 +25,5 @@ LinkingTo: Rcpp, RcppArmadillo, RcppTN, RcppProgress
 RoxygenNote: 7.1.2
 Depends: 
     RcppTN
+Suggests:
+    corrplot
