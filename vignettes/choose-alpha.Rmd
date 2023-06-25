@@ -1,0 +1,57 @@
+---
+title: "Choosing the value of alpha"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Choosing the value of alpha}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Currently, the model cannot estimate the value of alpha with the rest of the parameters, and thus, must be fixed previously.
+Usually, we do not know the true value of alpha, and we need a good estimation for it.
+The package `psych` provides an estimation for this parameter in the `polychoric` function.
+
+```{r setup}
+library(fatcat)
+library(psych)
+```
+
+```{r}
+alpha = polychoric(t(ordered_data$y))$tau
+alpha = cbind(-Inf, alpha, Inf)
+```
+
+With the estimate for the alpha matrix, we can fit the model.
+
+```{r}
+set.seed(1)
+res <- fitfatcat(
+  ordered_data$y,
+  q = 2,
+  alpha = alpha, 
+  nit = 10000,
+  lag = 9,
+  burnin = 1000, 
+  quiet = TRUE
+)
+```
+
+```{r}
+bayesplot::mcmc_trace(res, regex = "beta")
+```
+
+```{r}
+bayesplot::mcmc_trace(res, pars = dplyr::vars(dplyr::num_range("f_1", 1:5)))
+```
+
+```{r}
+bayesplot::mcmc_trace(res, regex = "sigma2")
+```
+

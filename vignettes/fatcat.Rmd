@@ -1,0 +1,49 @@
+---
+title: "Get started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Get started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The factor model for categorical data can be fitted from the fatcat package. The main arguments that require attention are the matrix of data, the number of factors and the values of the cutoff points, which are fixed. 
+
+```{r setup}
+library(fatcat)
+set.seed(1)
+```
+
+```{r}
+set.seed(1)
+res <- fitfatcat(
+  ordered_data$y,
+  q = 2,
+  alpha = ordered_data$true_alpha, 
+  nit = 10000,
+  lag = 9,
+  burnin = 1000, 
+  quiet = TRUE
+)
+```
+
+The output of the model is a `draws` object, from the `posterior` package. This makes it compatible with the `bayesplot` package, making it easy to access the trace of the generated chains.
+
+```{r}
+bayesplot::mcmc_trace(res, regex = "beta")
+```
+
+```{r}
+bayesplot::mcmc_trace(res, pars = dplyr::vars(dplyr::num_range("f_1", 1:5)))
+```
+
+```{r}
+bayesplot::mcmc_trace(res, regex = "sigma2")
+```
