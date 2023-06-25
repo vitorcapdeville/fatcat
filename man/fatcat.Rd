@@ -3,11 +3,8 @@
 \docType{package}
 \name{fatcat}
 \alias{fatcat}
-\title{fatcat}
+\title{An implementation of the factor model for categorical data}
 \description{
-Ajuste de modelos de analise fatorial para dados categoricos
-sob o enfoque bayesiano.
-}
-\author{
-Vitor Capdeville <vgcapdeville@hotmail.com>
+The fatcat package provides an implementation of the factor model for categorical data from
+[Capdeville, Gonçalves and Pereira (2021)]( https://doi.org/10.1080/02664763.2020.1796935)
 }

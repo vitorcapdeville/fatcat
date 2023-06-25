@@ -1,9 +1,12 @@
 Package: fatcat
 Type: Package
 Title: Bayesian categorical factor analysis using Rcpp
-Version: 0.2.0
-Authors@R: person("Vitor", "Capdeville", email = "vgcapdeville@hotmail.com",
-                  role = c("aut", "cre"))
+Version: 0.3.0
+Authors@R: c(
+    person("Vitor Capdeville", email = "vgcapdeville@hotmail.com", role = c("aut", "cre")),
+    person("Kelly C. M. Gon\u00e7alves", role = "aut"),
+    person("Jo\u00e3o B. M. Pereira", role = "aut")
+  )
 Description: Fit categorical factor analysis model using Metropolis Hastings algorithm.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -23,6 +26,7 @@ Suggests:
     corrplot,
     knitr,
     rmarkdown,
-    bayesplot
+    bayesplot,
+    dplyr
 VignetteBuilder: knitr
 URL: https://vitorcapdeville.github.io/fatcat/
