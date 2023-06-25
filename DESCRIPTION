@@ -23,7 +23,6 @@ Suggests:
     corrplot,
     knitr,
     rmarkdown,
-    patchwork,
     bayesplot
 VignetteBuilder: knitr
 URL: https://vitorcapdeville.github.io/fatcat/
