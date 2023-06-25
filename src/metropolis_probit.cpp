@@ -31,29 +31,6 @@ arma::mat passo_beta_probit(arma::mat y, arma::mat alpha, arma::mat beta, arma::
   double l_d_prop_cur_beta = 0;
   // densidade da proposta no valor corrente, dado o valor proposto.
   double l_d_cur_prop_beta = 0;
-  // arma::mat betaprop(p, q);
-  // for(int l=0; l <= q - 1; l++){
-  //   for(int j=0; j <= p - 1; j++){
-  //     betaprop(j,l) = R::rnorm(beta(j,l),sdpropbeta)*indica(j>l) + RcppTN::rtn1(beta(j,l),sdpropbeta2,0,R_PosInf)*indica(j==l);
-  //     if(j==l){
-  //       // Normal é simetrica, entao dnorm(betaprop, beta) = dnorm(beta, betaprop).
-  //       // normal truncada nao, entao preciso avaliar a densidade qnd tiver na truncada.
-  //       l_d_prop_cur_beta += log(RcppTN::dtn1(betaprop(j,l), beta(j,l),sdpropbeta2,0,R_PosInf));
-  //       l_d_cur_prop_beta += log(RcppTN::dtn1(beta(j,l), betaprop(j,l),sdpropbeta2,0,R_PosInf));
-  //     }
-  //   }
-  // }
-  // A1 = l_vero_probit(y, alpha, betaprop, f, sigma2) + l_priori_beta(betaprop, C0) + l_d_cur_prop_beta;
-  // A2 = l_vero_probit(y, alpha, beta, f, sigma2) + l_priori_beta(beta, C0) + l_d_prop_cur_beta;
-  // A  = std::exp(A1 - A2);
-  // auxvec = {1.0,A};
-  // pa = min(auxvec);
-  // u = R::runif(0.0,1.0);
-  // if(u < pa){
-  //   ret = betaprop;
-  // }else{
-  //   ret = beta;
-  // }
 
 
 
@@ -127,35 +104,14 @@ arma::mat passo_f_probit(arma::mat y, arma::mat alpha, arma::mat beta, arma::mat
   int n = f.n_cols;
 
   arma::mat ret(q,n);
-  // arma::colvec aux6(q);
   NumericVector auxvec(2);
-//
-//   arma::mat fprop(q, n);
-//   for (int l = 0; l <= q - 1; l++){
-//     for(int i = 0; i <= n - 1; i++) {
-//       fprop(l,i) = R::rnorm(f(l,i), sdpropf);
-//     }
-//   }
-//
-//   A1 = l_vero_probit(y, alpha, beta, fprop, sigma2) + l_priori_f(fprop);
-//   A2 = l_vero_probit(y, alpha, beta, f, sigma2) + l_priori_f(f);
-//   A  = std::exp(A1 - A2);
-//   auxvec = {1.0,A};
-//   pa = min(auxvec);
-//   u = R::runif(0.0,1.0);
-//   if(u<pa){
-//     ret = fprop;
-//   }else{
-//     ret = f;
-//   }
+
 
   arma::colvec fprop(q);
   for (int i = 0; i <= n - 1; i++) {
     for (int l = 0; l <= q - 1; l++){
       fprop(l) = R::rnorm(f(l,i), sdpropf);
     }
-    // aux6 = Rcpp::rnorm(q)*sdpropf;
-    // fprop = f.col(i) + aux6;
     A1 = l_vero_i_probit(y.col(i), alpha, beta, fprop,    sigma2) + l_priori_f_i(fprop);
     A2 = l_vero_i_probit(y.col(i), alpha, beta, f.col(i), sigma2) + l_priori_f_i(f.col(i));
     A  = std::exp(A1 - A2);
@@ -171,20 +127,18 @@ arma::mat passo_f_probit(arma::mat y, arma::mat alpha, arma::mat beta, arma::mat
   return ret;
 }
 
-//' Algoritmo de MH para gerar amostras da posteriori do modelo fatorial categórico ordenado probit
-//'
-//' @param y      [P x N] matriz de dados completa.
-//' @param nit    [1 x 1] numero de interacoes
-//' @param beta   [P x Q] valor inicial da matriz de cargas fatoriais.
-//' @param f      [Q x N] valor inicial da matriz de fatores.
-//' @param sigma2 [P x 1] valor inicial do vetor de variâncias.
-//' @param alpha  [P x K + 1] matriz com os valores fixados dos pontos de corte.
-//' @param C0     [1 x 1] variância das prioris para beta
-//' @param a,b   [1 x 1] parametros de shape e scale da priori de sigma2
-//' @param sdpropbeta,sdpropbeta2,sdpropf,sdpropsigma2 desvio padrao das propostas
-//' @param display_progress TRUE para exibir o indicador de progresso.
-//'
-//' @export
+// Algoritmo de MH para gerar amostras da posteriori do modelo fatorial categórico ordenado probit
+//
+// @param y      [P x N] matriz de dados completa.
+// @param nit    [1 x 1] numero de interacoes
+// @param beta   [P x Q] valor inicial da matriz de cargas fatoriais.
+// @param f      [Q x N] valor inicial da matriz de fatores.
+// @param sigma2 [P x 1] valor inicial do vetor de variâncias.
+// @param alpha  [P x K + 1] matriz com os valores fixados dos pontos de corte.
+// @param C0     [1 x 1] variância das prioris para beta
+// @param a,b   [1 x 1] parametros de shape e scale da priori de sigma2
+// @param sdpropbeta,sdpropbeta2,sdpropf,sdpropsigma2 desvio padrao das propostas
+// @param display_progress TRUE para exibir o indicador de progresso.
 // [[Rcpp::export]]
 List algoritmo_probit(arma::mat y, int nit , arma::mat beta, arma::mat f, arma::colvec sigma2, arma::mat alpha,
                       double C0 = 100000, double a = 0.001, double b = 0.001,
