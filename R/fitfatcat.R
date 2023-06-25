@@ -30,6 +30,11 @@ array2matrix <- function(array, name) {
 #'
 #' @return A posterior object with a sample from the posterior distribution.
 #'
+#' @examples
+#' post = fitfatcat(ordered_data$y, q = 2, nit = 1000,lag = 9, burnin = 100, quiet = TRUE)
+#' beta_post = posterior::subset_draws(post, variable = "beta", regex = TRUE)
+#' posterior::summarise_draws(beta_post)
+#'
 #' @import RcppTN
 #'
 #' @export

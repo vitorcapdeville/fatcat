@@ -1,8 +1,23 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # fatcat
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![R-CMD-check](https://github.com/vitorcapdeville/fatcat/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/vitorcapdeville/fatcat/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The fatcat package provides an interface to fit factor models for categorical data, described at [Capdeville, Gonçalves and Pereira (2021)]( https://doi.org/10.1080/02664763.2020.1796935).
@@ -16,16 +31,17 @@ You can install the development version of fatcat from [GitHub](https://github.c
 devtools::install_github("vitorcapdeville/fatcat")
 ```
 
+
 ## Usage
 
-``` r
+```{r}
 library(fatcat)
-post = fitfatcat(ordered_data$y, q = 2, nit = 10000,lag = 9, burnin = 1000)
-beta_post = posterior::subset_draws(res, variable = "beta", regex=T)
+post = fitfatcat(ordered_data$y, q = 2, nit = 10000,lag = 9, burnin = 1000, quiet = TRUE)
+beta_post = posterior::subset_draws(post, variable = "beta", regex = TRUE)
 posterior::summarise_draws(beta_post)
 ```
+
 
 ## Documentation
 
 The documentation for the package is available [here](https://vitorcapdeville.github.io/fatcat/).
-
