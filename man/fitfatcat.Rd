@@ -2,7 +2,7 @@
 % Please edit documentation in R/fitfatcat.R
 \name{fitfatcat}
 \alias{fitfatcat}
-\title{Função para gerar amostras da posterior, toda em C++.}
+\title{Draws samples from the posterior of the factorial model for categorical data.}
 \usage{
 fitfatcat(
   y,
@@ -19,47 +19,50 @@ fitfatcat(
   sdpropbeta2 = 0.075,
   sdpropf = 0.4,
   sdpropsigma2 = 0.075,
-  dist = c("probit", "logit"),
+  dist = c("probit"),
   quiet = F,
   alpha = NULL
 )
 }
 \arguments{
-\item{y}{dados. deve ter dimensao jxn}
+\item{y}{A matrix of integers with dimension j x n, where j is the number of variables and n the number of observations.}
 
-\item{q}{numero de fatores a serem usados no ajuste}
+\item{q}{An integer with the number of factors.}
 
-\item{nit}{numero de interacoes}
+\item{nit}{An integer with the number of iterations.}
 
-\item{burnin}{numero de interacoes iniciais a serem ignoradas}
+\item{burnin}{An integer with the number of initial iterations to be ignored.}
 
-\item{lag}{pegar uma a cada `lag` interacoes, após burnin.}
+\item{lag}{An integer with the lag of the iterations taken. ``lag = 1`` means take every iteration. ``lag = n`` means
+take one iteration every n iterations.}
 
-\item{init_beta}{valor inicial de beta}
+\item{init_beta}{An integer with the initial value of the first column of beta.}
 
-\item{init_sigma2}{valor inicial de sigma2}
+\item{init_sigma2}{An integer with the initial value of sigma2. All elements of the sigma2 vector will be initialized
+with the same value.}
 
-\item{C0}{variância das prioris para beta}
+\item{C0}{An integer with the variance of the prior for beta.}
 
-\item{a, b}{parametros de shape e scale da priori de sigma2}
+\item{a, b}{An integer with the shape and scale parameters of the prior of sigma2.}
 
-\item{sdpropbeta}{desvio padrao da proposta}
+\item{sdpropbeta}{An integer with the standard deviation of the proposal of betas that are unrestricted.}
 
-\item{sdpropbeta2}{desvio padrao da proposta}
+\item{sdpropbeta2}{An integer with the standard deviation of the proposal of betas that are restricted to be greater
+than or equal to zero.}
 
-\item{sdpropf}{desvio padrao da proposta}
+\item{sdpropf}{An integer with the standard deviation of the proposal of factors.}
 
-\item{sdpropsigma2}{desvio padrao da proposta}
+\item{sdpropsigma2}{An integer with the standard deviation of the proposal of sigma2.}
 
-\item{dist}{distribuição do erro. atualmente, probit ou logit.}
+\item{dist}{An string with the name of the error distribution. Currently, only `probit` is accepted.}
 
-\item{quiet}{se TRUE, impede o print do indicar de progresso}
+\item{quiet}{If TRUE, prevents the display of progress bar.}
 
-\item{alpha}{opcional, fornecer valores verdadeiros de alpha.}
+\item{alpha}{An vector with the true value of alpha. Usually, starts with -Inf and ends with +Inf.}
 }
 \value{
-uma lista com as cadeias a posteriori
+A posterior object with a sample from the posterior distribution.
 }
 \description{
-Função para gerar amostras da posterior, toda em C++.
+Draws samples from the posterior of the factorial model for categorical data.
 }

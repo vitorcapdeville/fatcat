@@ -9,21 +9,19 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    ggplot2,
-    glue,
-    invgamma,
     MASS,
-    mvtnorm,
-    patchwork,
+    posterior,
     psych,
-    purrr,
     Rcpp (>= 1.0.8),
-    stats,
-    truncnorm,
-    utils
+    stats
 LinkingTo: Rcpp, RcppArmadillo, RcppTN, RcppProgress
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Depends: 
+    R (>= 2.10),
     RcppTN
 Suggests:
-    corrplot
+    corrplot,
+    knitr,
+    rmarkdown,
+    patchwork
+VignetteBuilder: knitr

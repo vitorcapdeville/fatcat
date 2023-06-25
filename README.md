@@ -81,7 +81,6 @@ Fit the probit model to the simulated dataset.
 
 ``` r
 set.seed(1)
-# Ainda ta meio autocorrelacioanda. 
 res <- fitfatcat(
   y, q = 2, nit = 10000, dist = "probit", alpha = true_alpha, 
   C0 = 10, a = 0.01, b = 0.01, sdpropbeta = 0.035, sdpropbeta2 = 0.075,
@@ -89,42 +88,21 @@ res <- fitfatcat(
   # ,
   lag = 9, burnin = 1000
 )
-#> Executado em 26 secs
 
 
-plotfatcat(res, true_beta, "beta")
+bayesplot::mcmc_trace(res, regex = "beta")
 ```
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
 ``` r
-
-# plotfatcat(res, true_sigma, "sigma2")
-```
-
-``` r
-plotfatcat(res, true_f, "f")
-#> Plotting only res$f[,1:5,].
+bayesplot::mcmc_trace(res, pars = dplyr::vars(dplyr::num_range("f_1", 1:5)))
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
 ``` r
-plotfatcat(res, true_sigma, "sigma2")
+bayesplot::mcmc_trace(res, regex = "sigma2")
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
-
-<!-- Try the same, but with logit link function. -->
-<!-- ```{r} -->
-<!-- res <- fitfatcat(y, p = 2, nit = 5000, dist = "logit") -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- plotfatcat(res, true_f, "f") -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- plotfatcat(res, true_beta, "beta") -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- plotfatcat(res, true_sigma, "sigma2") -->
-<!-- ``` -->

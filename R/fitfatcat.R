@@ -1,31 +1,41 @@
-#' Função para gerar amostras da posterior, toda em C++.
+array2matrix <- function(array, name) {
+  new_as_matrix <- matrix(array, nrow = dim(array)[3], byrow = T)
+  aux_names <- expand.grid(seq_len(dim(array)[1]), seq_len(dim(array)[2]))
+  colnames(new_as_matrix) <- paste0(name, "_", aux_names$Var1, aux_names$Var2)
+  return(new_as_matrix)
+}
+
+
+#' Draws samples from the posterior of the factorial model for categorical data.
 #'
-#' @param y dados. deve ter dimensao jxn
-#' @param q numero de fatores a serem usados no ajuste
-#' @param nit numero de interacoes
-#' @param burnin numero de interacoes iniciais a serem ignoradas
-#' @param lag pegar uma a cada `lag` interacoes, após burnin.
-#' @param init_beta valor inicial de beta
-#' @param init_sigma2 valor inicial de sigma2
-#' @param C0 variância das prioris para beta
-#' @param a,b parametros de shape e scale da priori de sigma2
-#' @param sdpropbeta desvio padrao da proposta
-#' @param sdpropbeta2 desvio padrao da proposta
-#' @param sdpropf desvio padrao da proposta
-#' @param sdpropsigma2 desvio padrao da proposta
-#' @param dist distribuição do erro. atualmente, probit ou logit.
-#' @param quiet se TRUE, impede o print do indicar de progresso
-#' @param alpha opcional, fornecer valores verdadeiros de alpha.
+#' @param y A matrix of integers with dimension j x n, where j is the number of variables and n the number of observations.
+#' @param q An integer with the number of factors.
+#' @param nit An integer with the number of iterations.
+#' @param burnin An integer with the number of initial iterations to be ignored.
+#' @param lag An integer with the lag of the iterations taken. ``lag = 1`` means take every iteration. ``lag = n`` means
+#'  take one iteration every n iterations.
+#' @param init_beta An integer with the initial value of the first column of beta.
+#' @param init_sigma2 An integer with the initial value of sigma2. All elements of the sigma2 vector will be initialized
+#'  with the same value.
+#' @param C0 An integer with the variance of the prior for beta.
+#' @param a,b An integer with the shape and scale parameters of the prior of sigma2.
+#' @param sdpropbeta An integer with the standard deviation of the proposal of betas that are unrestricted.
+#' @param sdpropbeta2 An integer with the standard deviation of the proposal of betas that are restricted to be greater
+#'  than or equal to zero.
+#' @param sdpropf An integer with the standard deviation of the proposal of factors.
+#' @param sdpropsigma2  An integer with the standard deviation of the proposal of sigma2.
+#' @param dist An string with the name of the error distribution. Currently, only `probit` is accepted.
+#' @param quiet If TRUE, prevents the display of progress bar.
+#' @param alpha An vector with the true value of alpha. Usually, starts with -Inf and ends with +Inf.
 #'
-#' @return uma lista com as cadeias a posteriori
+#' @return A posterior object with a sample from the posterior distribution.
 #'
 #' @import RcppTN
 #'
 #' @export
-fitfatcat <- function(y, q, nit, burnin = 0, lag = 1, init_beta = 0.5, init_sigma2 = 2, C0 = 100000, a = 0.001, b = 0.001, sdpropbeta = 0.05, sdpropbeta2 = 0.075, sdpropf = 0.4, sdpropsigma2 = 0.075, dist = c("probit", "logit"), quiet = F, alpha = NULL) {
+fitfatcat <- function(y, q, nit, burnin = 0, lag = 1, init_beta = 0.5, init_sigma2 = 2, C0 = 100000, a = 0.001, b = 0.001, sdpropbeta = 0.05, sdpropbeta2 = 0.075, sdpropf = 0.4, sdpropsigma2 = 0.075, dist = c("probit"), quiet = F, alpha = NULL) {
   # Definicoes e valores iniciais
   dist <- match.arg(dist)
-  if (dist != "probit") stop("Distribuicao logistica em construcao.")
 
   p <- nrow(y)
   n <- ncol(y)
@@ -37,26 +47,20 @@ fitfatcat <- function(y, q, nit, burnin = 0, lag = 1, init_beta = 0.5, init_sigm
   sigma2 <- rep(init_sigma2, p)
   f <- matrix(0.5, nrow = q, ncol = n)
 
-  if (is.null(alpha)) alpha <- cbind(-Inf,psych::polychoric(t(y))$tau, Inf)
+  if (is.null(alpha)) alpha <- cbind(-Inf, psych::polychoric(t(y))$tau, Inf)
 
   # Algoritmo
-  tempo1 <- Sys.time()
   res <- algoritmo_probit(y, nit + 1, beta, f, sigma2, alpha, C0, a, b, sdpropbeta, sdpropbeta2, sdpropf, sdpropsigma2, !quiet)
 
-  # if (dist == "probit") {
-  #   res <- algoritmo_probit(y, nit, beta, sigma2, f, alpha, sdpropbeta, sdpropbeta2, sdpropf, sdpropsigma2, n, q, p, !quiet)
-  # } else {
-  #   res <- algoritmo_logit(y, nit, beta, sigma2, f, alpha, sdpropbeta, sdpropbeta2, sdpropf, sdpropsigma2, n, q, p, !quiet)
-  # }
+  new_beta <- array2matrix(res$beta, "beta")
+  new_f <- array2matrix(res$f, "f")
+  new_sigma2 <- t(res$sigma2)
+  colnames(new_sigma2) <- paste0("sigma2_", seq_len(dim(res$sigma2)[1]))
+  posterior_dist <- posterior::as_draws(cbind(new_beta, new_f, new_sigma2))
 
-  trim <- trunc(seq(from = burnin + 1, to = min(nit,dim(res$beta)[3]), by = lag))
-  res$beta <- res$beta[, , trim, drop = F]
-  res$sigma2 <- res$sigma2[, trim, drop = F]
-  res$f <- res$f[, , trim, drop = F]
+  posterior_dist <- posterior::subset_draws(posterior_dist, iteration = seq(from = burnin + 1, to = min(nit, dim(res$beta)[3])))
+  posterior_dist <- posterior::thin_draws(posterior_dist, thin = lag)
 
-  tempo2 <- Sys.time()
 
-  if (!quiet) message("Executado em ", round(difftime(tempo2, tempo1), 2), " ", units(difftime(tempo2, tempo1)))
-
-  return(res)
+  return(posterior_dist)
 }
